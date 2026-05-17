@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}友链 · {{ config.siteName }}{% endblock %}
+{% block body_class %}page-links{% endblock %}
+
+{% block main %}
+<div class="index-content">
+  <h1 class="post-title">友链</h1>
+</div>
+
+<div class="content">
+  {% if links and links|length > 0 %}
+  <ul class="links-list">
+    {% for link in links %}
+    <li class="link-item">
+      <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
+        {% if link.avatar %}
+          <img src="{{ link.avatar }}" alt="{{ link.name }}" class="link-avatar" loading="lazy">
+        {% endif %}
+        <div class="link-info">
+          <strong>{{ link.name }}</strong>
+          {% if link.desc %}<p>{{ link.desc }}</p>{% elif link.description %}<p>{{ link.description }}</p>{% endif %}
+        </div>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>暂无友链。</p>
+  {% endif %}
+</div>
+
+<style>
+.links-list { list-style: none; padding: 0; }
+.link-item { margin-bottom: 1.5em; }
+.link-item a { display: flex; align-items: center; gap: 1em; text-decoration: none; color: inherit; border: none; }
+.link-item a:hover { color: var(--link-color); }
+.link-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.link-info strong { display: block; font-size: 16px; }
+.link-info p { margin: 0.25em 0 0; font-size: 14px; color: var(--post-info-color); }
+</style>
+{% endblock %}

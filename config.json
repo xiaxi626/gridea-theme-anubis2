@@ -1,0 +1,220 @@
+{
+  "name": "anubis2 Jinja2",
+  "version": "1.0.0",
+  "author": "Junyi",
+  "description": "Hugo Anubis2 主题的 Gridea Pro 移植：简约优雅的博客主题，支持深浅色切换、代码高亮、MathJax、Mermaid 图表。",
+  "templateEngine": "jinja2",
+  "repository": "https://github.com/hugo-theme-anubis2/hugo-theme-anubis2",
+  "customConfig": [
+    {
+      "name": "subtitle",
+      "label": "站点副标题",
+      "group": "基础设置",
+      "type": "input",
+      "value": "",
+      "note": "显示在站点标题下的小字"
+    },
+    {
+      "name": "postsPerPage",
+      "label": "每页文章数",
+      "group": "基础设置",
+      "type": "number",
+      "value": 10,
+      "note": "首页和列表页每页显示的文章数"
+    },
+    {
+      "name": "footerCopyright",
+      "label": "页脚版权文字",
+      "group": "基础设置",
+      "type": "input",
+      "value": "",
+      "note": "留空则显示默认版权信息"
+    },
+    {
+      "name": "hideFooterAttribution",
+      "label": "隐藏页脚版权归属",
+      "group": "基础设置",
+      "type": "boolean",
+      "value": false,
+      "note": "隐藏「Powered by Hugo, theme Anubis2」"
+    },
+    {
+      "name": "icpBeian",
+      "label": "ICP 备案号",
+      "group": "基础设置",
+      "type": "input",
+      "value": "",
+      "note": "如「京ICP备12345678号」"
+    },
+    {
+      "name": "policeBeian",
+      "label": "公网安备号",
+      "group": "基础设置",
+      "type": "input",
+      "value": "",
+      "note": "如「京公网安备 12345678号」"
+    },
+    {
+      "name": "colorTheme",
+      "label": "默认配色",
+      "group": "外观设置",
+      "type": "select",
+      "value": "auto",
+      "options": [
+        { "label": "跟随系统", "value": "auto" },
+        { "label": "浅色", "value": "light" },
+        { "label": "深色", "value": "dark" }
+      ],
+      "note": "auto 模式跟随系统设置自动切换"
+    },
+    {
+      "name": "enableColorThemeSwitcher",
+      "label": "启用主题切换按钮",
+      "group": "外观设置",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "name": "primaryColor",
+      "label": "主题色",
+      "group": "外观设置",
+      "type": "color",
+      "value": "#1d60a3",
+      "note": "链接和高亮颜色"
+    },
+    {
+      "name": "enableSummary",
+      "label": "启用文章摘要",
+      "group": "文章设置",
+      "type": "boolean",
+      "value": true,
+      "note": "在列表页显示文章摘要预览"
+    },
+    {
+      "name": "enableReadMoreButton",
+      "label": "启用阅读更多按钮",
+      "group": "文章设置",
+      "type": "boolean",
+      "value": false
+    },
+    {
+      "name": "enableCopyCodeButton",
+      "label": "启用代码复制按钮",
+      "group": "文章设置",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "name": "tocWordCount",
+      "label": "目录显示阈值",
+      "group": "文章设置",
+      "type": "number",
+      "value": 400,
+      "note": "文章字数超过此值时显示目录，0 表示禁用"
+    },
+    {
+      "name": "readNextPosts",
+      "label": "相关文章数量",
+      "group": "文章设置",
+      "type": "number",
+      "value": 5,
+      "note": "文章底部显示的相关文章数，0 表示禁用"
+    },
+    {
+      "name": "openInNewTab",
+      "label": "外链新窗口打开",
+      "group": "文章设置",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "name": "enableMathGlobally",
+      "label": "全局启用 MathJax",
+      "group": "高级功能",
+      "type": "boolean",
+      "value": false,
+      "note": "开启后所有页面加载 MathJax，否则仅在文章页面加载"
+    },
+    {
+      "name": "enableRssIcon",
+      "label": "显示 RSS 图标",
+      "group": "社交设置",
+      "type": "boolean",
+      "value": true
+    },
+    {
+      "name": "githubUrl",
+      "label": "GitHub 链接",
+      "group": "社交设置",
+      "type": "input",
+      "value": ""
+    },
+    {
+      "name": "twitterUrl",
+      "label": "Twitter / X 链接",
+      "group": "社交设置",
+      "type": "input",
+      "value": ""
+    },
+    {
+      "name": "linkedinUrl",
+      "label": "LinkedIn 链接",
+      "group": "社交设置",
+      "type": "input",
+      "value": ""
+    },
+    {
+      "name": "emailAddress",
+      "label": "Email 地址",
+      "group": "社交设置",
+      "type": "input",
+      "value": ""
+    },
+    {
+      "name": "telegramUrl",
+      "label": "Telegram 链接",
+      "group": "社交设置",
+      "type": "input",
+      "value": ""
+    },
+    {
+      "name": "youtubeUrl",
+      "label": "YouTube 链接",
+      "group": "社交设置",
+      "type": "input",
+      "value": ""
+    },
+    {
+      "name": "enableComments",
+      "label": "启用评论",
+      "group": "评论设置",
+      "type": "boolean",
+      "value": true,
+      "note": "在文章详情页渲染评论容器"
+    },
+    {
+      "name": "customCss",
+      "label": "自定义 CSS",
+      "group": "高级设置",
+      "type": "textarea",
+      "value": "",
+      "note": "追加到主题样式末尾"
+    },
+    {
+      "name": "headerScript",
+      "label": "Head 注入代码",
+      "group": "高级设置",
+      "type": "code",
+      "value": "",
+      "note": "在 </head> 前注入，可放统计代码"
+    },
+    {
+      "name": "footerScript",
+      "label": "Footer 注入代码",
+      "group": "高级设置",
+      "type": "code",
+      "value": "",
+      "note": "在 </body> 前注入，可放评论 SDK"
+    }
+  ]
+}

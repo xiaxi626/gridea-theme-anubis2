@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block body_class %}page-home{% endblock %}
+
+{% block og_url %}/{% endblock %}
+
+{% block main %}
+<div class="homepage-content">
+  {# 首页自定义内容区域，可在 Gridea 中编辑首页 #}
+</div>
+
+<div class="articles h-feed">
+  {% for post in posts %}
+    {% if not post.hideInList %}
+      {% include "partials/post-card.html" %}
+    {% endif %}
+  {% endfor %}
+  
+  {% include "partials/pagination.html" %}
+</div>
+{% endblock %}

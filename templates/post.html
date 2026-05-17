@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} · {{ config.siteName }}{% endblock %}
+{% block meta_description %}{{ config.siteDescription }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ post.title }}{% endblock %}
+{% block og_description %}{{ config.siteDescription }}{% endblock %}
+{% block og_url %}{{ post.link }}{% endblock %}
+{% block og_image %}{% if post.feature %}<meta property="og:image" content="{{ post.feature }}">{% else %}{% if config.avatar %}<meta property="og:image" content="{{ config.avatar }}">{% endif %}{% endif %}{% endblock %}
+
+{% block body_class %}page-post{% endblock %}
+
+{% block main %}
+<article class="post h-entry">
+  <div class="post-header">
+    <header>
+      <h1 class="p-name post-title{% if post.isTop %} favorite{% endif %}">{{ post.title }}</h1>
+    </header>
+    {% include "partials/post-meta.html" %}
+  </div>
+
+  {# 目录 #}
+  {% include "partials/toc.html" %}
+
+  <div class="content e-content">
+    {{ post.content|safe }}
+  </div>
+</article>
+
+{# 相关文章 - 基于标签匹配 #}
+{% if theme_config.readNextPosts and theme_config.readNextPosts != 0 %}
+<section class="read-next">
+  <h3 class="read-next-title">相关文章</h3>
+  <ul class="read-next-posts">
+    {% for related_post in posts %}
+      {% if forloop.Counter <= theme_config.readNextPosts and related_post.link != post.link %}
+        {% for tag in post.tags %}
+          {% for rtag in related_post.tags %}
+            {% if tag.name == rtag.name %}
+              <li><a href="{{ related_post.link }}">{{ related_post.title }}</a></li>
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{# 评论 #}
+{% if theme_config.enableComments %}
+  {% include "partials/comments.html" %}
+{% endif %}
+
+{# MathJax - 文章页面始终加载（全局未开启时才在此加载，避免重复） #}
+{% if not theme_config.enableMathGlobally %}
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+{% endif %}
+
+{# Mermaid 图表支持 #}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'default',
+    securityLevel: 'loose',
+  });
+</script>
+{% endblock %}

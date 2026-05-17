@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}关于 · {{ config.siteName }}{% endblock %}
+{% block body_class %}page-about{% endblock %}
+
+{% block main %}
+<article class="post">
+  <div class="post-header">
+    <header>
+      <h1 class="post-title">关于</h1>
+    </header>
+  </div>
+  <div class="content e-content">
+    {{ post.content|safe }}
+  </div>
+</article>
+{% endblock %}

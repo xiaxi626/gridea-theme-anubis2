@@ -1,0 +1,9 @@
+{# 图标渲染辅助模板
+   用法: {% include "partials/icon.html" with icon="github", type="tabler" %}
+   type 可选: tabler, fa (默认 tabler)
+#}
+{% if type == "fa" %}
+<img src="/media/icons/fa-icons/{{ icon }}.svg" alt="{{ icon }}" class="inline-svg">
+{% else %}
+<img src="/media/icons/tabler-icons/{{ icon }}.svg" alt="{{ icon }}" class="inline-svg">
+{% endif %}

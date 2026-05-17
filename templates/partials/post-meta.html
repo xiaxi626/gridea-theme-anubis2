@@ -1,0 +1,21 @@
+<div class="post-info noselect">
+  {# 发布日期 #}
+  {% if post.date %}
+  <div class="post-date dt-published">
+    <time datetime="{{ post.date }}">{{ post.dateFormat }}</time>
+  </div>
+  {% endif %}
+
+  <a class="post-hidden-url u-url" href="{{ post.link }}">{{ post.link }}</a>
+
+  {# 标签 #}
+  {% if post.tags and post.tags|length > 0 %}
+  <div class="post-taxonomies">
+    <ul class="post-tags">
+      {% for tag in post.tags %}
+        <li><a href="{{ tag.link }}">#{{ tag.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</div>

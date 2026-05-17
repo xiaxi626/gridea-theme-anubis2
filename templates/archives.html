@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}归档 · {{ config.siteName }}{% endblock %}
+{% block body_class %}page-archives{% endblock %}
+
+{% block main %}
+<div class="index-content">
+  <h1 class="post-title">归档</h1>
+</div>
+
+{# 日期滑动切换 #}
+<div class="archive-date-slider">
+  <button class="slider-btn" onclick="scrollDates(-1)">←</button>
+  <div class="dates-container" id="datesContainer"></div>
+  <button class="slider-btn" onclick="scrollDates(1)">→</button>
+</div>
+
+<div class="articles h-feed archive-list" id="archiveList">
+  {% for post in posts %}
+    {% if not post.hideInList %}
+      <div class="post-short-list h-entry archive-item">
+        <div class="post-header">
+          <header>
+            <h2 class="p-name post-title">
+              <a class="u-url" href="{{ post.link }}">{{ post.title }}</a>
+            </h2>
+          </header>
+        </div>
+        {% include "partials/post-meta.html" %}
+      </div>
+    {% endif %}
+  {% endfor %}
+
+  {% include "partials/pagination.html" %}
+</div>
+
+<script>
+(function() {
+  var items = document.querySelectorAll('.archive-item');
+  
+  // 从文章数据中提取所有年月
+  var dateSet = new Set();
+  var minYear = 9999, maxYear = 0;
+  items.forEach(function(post) {
+    var timeEl = post.querySelector('time');
+    if (timeEl) {
+      var dateText = timeEl.textContent.trim();
+      var match = dateText.match(/(\d{4})[-年](\d{1,2})/);
+      if (match) {
+        var year = parseInt(match[1]);
+        var month = parseInt(match[2]);
+        var ym = match[1] + '-' + match[2].padStart(2, '0');
+        dateSet.add(ym);
+        post.setAttribute('data-date', ym);
+        if (year < minYear) minYear = year;
+        if (year > maxYear) maxYear = year;
+      }
+    }
+  });
+  
+  // 生成从最早到现在的所有年月
+  var now = new Date();
+  var currentYear = now.getFullYear();
+  var currentMonth = now.getMonth() + 1;
+  
+  // 如果没有文章，使用当前年份
+  if (minYear === 9999) minYear = currentYear;
+  if (maxYear === 0) maxYear = currentYear;
+  
+  var allDates = [];
+  for (var y = currentYear; y >= minYear; y--) {
+    var startMonth = (y === currentYear) ? currentMonth : 12;
+    var endMonth = (y === minYear) ? 1 : 1;
+    for (var m = startMonth; m >= endMonth; m--) {
+      allDates.push(y + '-' + String(m).padStart(2, '0'));
+    }
+  }
+  
+  var container = document.getElementById('datesContainer');
+  
+  if (allDates.length > 0) {
+    allDates.forEach(function(ym) {
+      var a = document.createElement('a');
+      a.className = 'date-item';
+      a.setAttribute('data-ym', ym);
+      a.textContent = ym;
+      
+      // 当前页有该日期的文章 → 可点击跳转；没有 → 置灰
+      if (dateSet.has(ym)) {
+        a.onclick = function(e) {
+          e.preventDefault();
+          var target = document.querySelector('.archive-item[data-date="' + ym + '"]');
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.querySelectorAll('.date-item').forEach(function(item) {
+              item.classList.remove('active');
+            });
+            a.classList.add('active');
+          }
+        };
+      } else {
+        a.classList.add('date-item-empty');
+      }
+      
+      container.appendChild(a);
+    });
+  } else {
+    document.querySelector('.archive-date-slider').style.display = 'none';
+  }
+  
+  // 滚动日期栏
+  window.scrollDates = function(direction) {
+    container.scrollBy({ left: direction * 100, behavior: 'smooth' });
+  };
+  
+  // 按住拖动滑动（优化丝滑度）
+  var isDown = false;
+  var startX = 0;
+  var scrollLeft = 0;
+  var velocity = 0;
+  var lastX = 0;
+  var lastTime = 0;
+  var animFrame = null;
+  
+  container.style.scrollBehavior = 'auto';
+  container.style.willChange = 'scroll-left';
+  
+  function getPageX(e) {
+    return e.touches ? e.touches[0].pageX : e.pageX;
+  }
+  
+  function startDrag(e) {
+    isDown = true;
+    if (animFrame) cancelAnimationFrame(animFrame);
+    container.style.cursor = 'grabbing';
+    container.style.scrollBehavior = 'auto';
+    var pageX = getPageX(e);
+    startX = pageX - container.offsetLeft;
+    scrollLeft = container.scrollLeft;
+    lastX = startX;
+    lastTime = Date.now();
+    velocity = 0;
+  }
+  
+  function endDrag() {
+    if (!isDown) return;
+    isDown = false;
+    container.style.cursor = 'grab';
+    // 惯性滑动
+    if (Math.abs(velocity) > 0.3) {
+      var inertia = function() {
+        velocity *= 0.95;
+        if (Math.abs(velocity) < 0.1) return;
+        container.scrollLeft -= velocity * 10;
+        animFrame = requestAnimationFrame(inertia);
+      };
+      inertia();
+    }
+  }
+  
+  function doDrag(e) {
+    if (!isDown) return;
+    e.preventDefault();
+    var pageX = getPageX(e);
+    var x = pageX - container.offsetLeft;
+    var walk = x - startX;
+    var now = Date.now();
+    var dt = now - lastTime;
+    if (dt > 0) {
+      velocity = (x - lastX) / dt;
+    }
+    lastX = x;
+    lastTime = now;
+    container.scrollLeft = scrollLeft - walk;
+  }
+  
+  container.addEventListener('mousedown', startDrag);
+  document.addEventListener('mouseup', endDrag);
+  container.addEventListener('mousemove', doDrag);
+  
+  // 触摸支持
+  container.addEventListener('touchstart', startDrag, {passive: false});
+  container.addEventListener('touchend', endDrag);
+  container.addEventListener('touchmove', doDrag, {passive: false});
+})();
+</script>
+
+<style>
+/* 日期滑动切换 */
+.archive-date-slider {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: 1em 0;
+  padding: 0.5em;
+  background: var(--card-color);
+  border-radius: var(--card-border-radius);
+  border: 1px solid var(--card-border-color);
+}
+.dates-container {
+  flex: 1;
+  display: flex;
+  gap: 0.5em;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+}
+.dates-container::-webkit-scrollbar { display: none; }
+.dates-container:active {
+  cursor: grabbing;
+}
+.date-item {
+  flex-shrink: 0;
+  padding: 0.3em 0.8em;
+  font-size: 13px;
+  color: var(--font-color);
+  background: var(--bg-color);
+  border-radius: 4px;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.date-item:hover, .date-item.active {
+  background: var(--link-color);
+  color: #fff;
+  text-decoration: none;
+}
+.date-item-empty {
+  opacity: 0.35;
+  cursor: default;
+}
+.slider-btn {
+  flex-shrink: 0;
+  padding: 0.3em 0.5em;
+  font-size: 14px;
+  background: none;
+  border: none;
+  color: var(--link-color);
+  cursor: pointer;
+}
+
+/* 归档页紧凑样式 */
+.archive-list .post-short-list {
+  padding: 0.6em 0;
+  border-bottom: 1px solid var(--card-border-color);
+}
+.archive-list .post-short-list:last-child {
+  border-bottom: none;
+}
+.archive-list .post-title {
+  font-size: 16px;
+  margin: 0 0 0.2em;
+}
+.archive-list .post-info {
+  font-size: 13px;
+  margin-top: 0.2em;
+}
+.archive-list .post-tags {
+  display: inline;
+  margin-left: 0.5em;
+}
+.archive-list .post-tags li {
+  display: inline;
+  margin-right: 0.4em;
+}
+</style>
+{% endblock %}

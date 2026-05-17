@@ -1,0 +1,62 @@
+<details class="toc noselect">
+  <summary>目录</summary>
+  <div class="inner">
+    <nav class="toc-nav" id="tocNav"></nav>
+  </div>
+</details>
+
+<script>
+(function() {
+  function initToc() {
+    var content = document.querySelector('.e-content');
+    var tocNav = document.getElementById('tocNav');
+    if (!content || !tocNav) return;
+
+    var headings = content.querySelectorAll('h2, h3, h4');
+    if (headings.length === 0) {
+      var tocDetails = tocNav.closest('.toc');
+      if (tocDetails) tocDetails.style.display = 'none';
+      return;
+    }
+
+    // 找出最高级别的标题（数字最小的，如 h2 < h3 < h4）
+    var minLevel = 4;
+    headings.forEach(function(h) {
+      var level = parseInt(h.tagName.charAt(1));
+      if (level < minLevel) minLevel = level;
+    });
+
+    var ul = document.createElement('ul');
+    headings.forEach(function(h, i) {
+      var id = h.id || ('toc-heading-' + i);
+      h.id = id;
+      
+      var level = parseInt(h.tagName.charAt(1));
+      var li = document.createElement('li');
+      // 只有最高级别标题加粗
+      li.className = 'toc-' + h.tagName.toLowerCase() + (level === minLevel ? ' toc-bold' : '');
+      
+      var a = document.createElement('a');
+      a.href = '#' + id;
+      a.textContent = h.textContent.trim();
+      a.onclick = function(e) {
+        e.preventDefault();
+        h.scrollIntoView({ behavior: 'smooth' });
+        history.pushState(null, null, '#' + id);
+      };
+      
+      li.appendChild(a);
+      ul.appendChild(li);
+    });
+    
+    tocNav.innerHTML = '';
+    tocNav.appendChild(ul);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initToc);
+  } else {
+    initToc();
+  }
+})();
+</script>

@@ -1,0 +1,45 @@
+<header class="common-header">
+<div class="header-top">
+  <div class="header-top-left">
+    {# 站点标题 - 左侧 #}
+    <h1 class="site-title noselect">
+      <a href="/">{{ config.siteName }}</a>
+      {% if theme_config.subtitle %}<span class="site-subtitle">{{ theme_config.subtitle }}</span>{% endif %}
+    </h1>
+
+    {# 主题切换 - 标题和图标之间 #}
+    {% if theme_config.enableColorThemeSwitcher %}
+    <div class="theme-switcher" title="切换主题">
+      <svg class="inline-svg" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+    </div>
+    {% endif %}
+
+    {# 社交图标 - 右侧 #}
+    {% include "partials/social-icons.html" %}
+  </div>
+</div>
+
+{# 导航菜单 - 使用 Gridea Pro 的 menus 变量 #}
+{% if menus and menus|length > 0 %}
+<nav class="noselect">
+  {% for menu in menus %}
+    <a href="{{ menu.link }}">{{ menu.name }}</a>
+  {% endfor %}
+</nav>
+{% endif %}
+
+{# 全局 MathJax #}
+{% if theme_config.enableMathGlobally %}
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+{% endif %}
+</header>

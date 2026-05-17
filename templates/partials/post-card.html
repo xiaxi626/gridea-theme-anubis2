@@ -1,0 +1,36 @@
+<article class="post-list h-feed post-card">
+  <div class="post-header">
+    <header>
+      <h1 class="p-name post-title{% if post.isTop %} favorite{% endif %}">
+        <a class="u-url" href="{{ post.link }}">{{ post.title }}</a>
+      </h1>
+    </header>
+  </div>
+
+  {# 特色图片 #}
+  {% if post.feature %}
+  <div class="post-thumbnail">
+    <img src="{{ post.feature }}" alt="{{ post.title }}" loading="lazy">
+  </div>
+  {% endif %}
+
+  {# 文章摘要 #}
+  {% if theme_config.enableSummary %}
+  <div class="content post-summary p-summary">
+    {% if post.summary %}
+      {{ post.summary|safe }}
+    {% elif post.content %}
+      {{ post.content|striptags|truncatechars:150 }}
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# 阅读更多按钮 #}
+  {% if theme_config.enableReadMoreButton %}
+  <div class="read-more">
+    <a class="u-url" href="{{ post.link }}">阅读更多</a>
+  </div>
+  {% endif %}
+
+  {% include "partials/post-meta.html" %}
+</article>

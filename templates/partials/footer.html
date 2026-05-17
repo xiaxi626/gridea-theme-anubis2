@@ -1,0 +1,34 @@
+<footer class="common-footer noselect">
+<div class="common-footer-bottom">
+  {# 版权信息 - 左下角 #}
+  <div class="footer-left">
+    {% if theme_config.footerCopyright %}
+      {{ theme_config.footerCopyright|safe }}
+    {% else %}
+      © {{ now|date:"2006" }} {{ config.siteName }}
+    {% endif %}
+
+    {# 中国备案信息 #}
+    {% if theme_config.policeBeian %}
+      <span class="footer-beian">
+        <img src="https://beian.mps.gov.cn/img/logo01.dd7ff50e.png" alt="备案图标" class="footer-beian-icon">
+        <a target="_blank" href="https://www.beian.gov.cn/portal/registerSystemInfo">{{ theme_config.policeBeian }}</a>
+      </span>
+    {% endif %}
+
+    {% if theme_config.icpBeian %}
+      <span class="footer-beian">
+        <a target="_blank" href="https://beian.miit.gov.cn/">{{ theme_config.icpBeian }}</a>
+      </span>
+    {% endif %}
+  </div>
+
+  {# 主题归属 - 右下角 #}
+  {% if not theme_config.hideFooterAttribution %}
+  <div class="footer-attribution">
+    Powered by <a target="_blank" rel="noopener noreferrer" href="https://github.com/Gridea-Pro/gridea-pro">Gridea Pro</a>,
+    theme <a target="_blank" rel="noopener noreferrer" href="https://github.com/hugo-theme-anubis2/hugo-theme-anubis2">Anubis2</a>
+  </div>
+  {% endif %}
+</div>
+</footer>
