@@ -128,14 +128,6 @@
       "value": true
     },
     {
-      "name": "enableMathGlobally",
-      "label": "全局启用 MathJax",
-      "group": "高级功能",
-      "type": "boolean",
-      "value": false,
-      "note": "开启后所有页面加载 MathJax，否则仅在文章页面加载"
-    },
-    {
       "name": "enableRssIcon",
       "label": "显示 RSS 图标",
       "group": "社交设置",

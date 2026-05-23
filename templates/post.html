@@ -52,23 +52,6 @@
   {% include "partials/comments.html" %}
 {% endif %}
 
-{# MathJax - 文章页面始终加载（全局未开启时才在此加载，避免重复） #}
-{% if not theme_config.enableMathGlobally %}
-<script>
-  window.MathJax = {
-    tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']],
-      displayMath: [['$$', '$$'], ['\\[', '\\]']],
-      processEscapes: true
-    },
-    options: {
-      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-    }
-  };
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-{% endif %}
-
 {# Mermaid 图表支持 #}
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <script>

@@ -14,13 +14,13 @@
   </div>
   {% endif %}
 
-  {# 文章摘要 #}
+  {# 文章摘要 - 有 summary 时保留 HTML（支持 KaTeX）；否则从正文跳过标题后截取纯文本 #}
   {% if theme_config.enableSummary %}
-  <div class="content post-summary p-summary">
+  <div class="content post-summary p-summary" v-pre>
     {% if post.summary %}
       {{ post.summary|safe }}
-    {% elif post.content %}
-      {{ post.content|striptags|truncatechars:150 }}
+    {% else %}
+      <div class="post-summary-fallback" data-truncate="150" v-pre>{{ post.content|safe }}</div>
     {% endif %}
   </div>
   {% endif %}
