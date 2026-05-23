@@ -8,13 +8,6 @@
   <h1 class="post-title">归档</h1>
 </div>
 
-{# 日期滑动切换 #}
-<div class="archive-date-slider">
-  <button class="slider-btn" onclick="scrollDates(-1)">←</button>
-  <div class="dates-container" id="datesContainer"></div>
-  <button class="slider-btn" onclick="scrollDates(1)">→</button>
-</div>
-
 <div class="articles h-feed archive-list" id="archiveList">
   {% for post in posts %}
     {% if not post.hideInList %}
@@ -37,185 +30,88 @@
 <script>
 (function() {
   var items = document.querySelectorAll('.archive-item');
+  var paginationInfo = {
+    current: {{ pagination.current|default:1 }},
+    total: {{ pagination.total|default:1 }}
+  };
   
-  // 从文章数据中提取所有年月
-  var dateSet = new Set();
-  var minYear = 9999, maxYear = 0;
-  items.forEach(function(post) {
+  // 从文章中提取年份信息并统计数量
+  var years = [];
+  var yearCounts = {};
+  var lastYear = null;
+  
+  items.forEach(function(post, index) {
     var timeEl = post.querySelector('time');
     if (timeEl) {
-      var dateText = timeEl.textContent.trim();
-      var match = dateText.match(/(\d{4})[-年](\d{1,2})/);
+      var dateText = timeEl.getAttribute('datetime') || timeEl.textContent.trim();
+      var match = dateText.match(/(\d{4})[-年]/);
       if (match) {
-        var year = parseInt(match[1]);
-        var month = parseInt(match[2]);
-        var ym = match[1] + '-' + match[2].padStart(2, '0');
-        dateSet.add(ym);
-        post.setAttribute('data-date', ym);
-        if (year < minYear) minYear = year;
-        if (year > maxYear) maxYear = year;
+        var year = match[1];
+        post.setAttribute('data-year', year);
+        if (years.indexOf(year) === -1) years.push(year);
+        yearCounts[year] = (yearCounts[year] || 0) + 1;
+        lastYear = year;
       }
     }
   });
   
-  // 仅使用当前页实际存在的年月（不再生成无文章的年月）
-  var allDates = Array.from(dateSet).sort().reverse();
-  
-  var container = document.getElementById('datesContainer');
-  
-  if (allDates.length > 0) {
-    allDates.forEach(function(ym) {
-      var a = document.createElement('a');
-      a.className = 'date-item';
-      a.setAttribute('data-ym', ym);
-      a.textContent = ym;
-      
-      // 点击滚动到对应日期的文章
-      a.onclick = function(e) {
-        e.preventDefault();
-        var target = document.querySelector('.archive-item[data-date="' + ym + '"]');
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          document.querySelectorAll('.date-item').forEach(function(item) {
-            item.classList.remove('active');
-          });
-          a.classList.add('active');
-        }
-      };
-      
-      container.appendChild(a);
-    });
-  } else {
-    document.querySelector('.archive-date-slider').style.display = 'none';
+  // 获取前一页最后一个年份（用于判断是否需要显示第一个年份标题）
+  var prevPageLastYear = null;
+  if (paginationInfo.current > 1) {
+    prevPageLastYear = sessionStorage.getItem('archive_prev_last_year');
   }
   
-  // 滚动日期栏
-  window.scrollDates = function(direction) {
-    container.scrollBy({ left: direction * 100, behavior: 'smooth' });
-  };
+  // 按年份分组并插入年份标题
+  var processedYears = new Set();
   
-  // 按住拖动滑动（优化丝滑度）
-  var isDown = false;
-  var startX = 0;
-  var scrollLeft = 0;
-  var velocity = 0;
-  var lastX = 0;
-  var lastTime = 0;
-  var animFrame = null;
-  
-  container.style.scrollBehavior = 'auto';
-  container.style.willChange = 'scroll-left';
-  
-  function getPageX(e) {
-    return e.touches ? e.touches[0].pageX : e.pageX;
-  }
-  
-  function startDrag(e) {
-    isDown = true;
-    if (animFrame) cancelAnimationFrame(animFrame);
-    container.style.cursor = 'grabbing';
-    container.style.scrollBehavior = 'auto';
-    var pageX = getPageX(e);
-    startX = pageX - container.offsetLeft;
-    scrollLeft = container.scrollLeft;
-    lastX = startX;
-    lastTime = Date.now();
-    velocity = 0;
-  }
-  
-  function endDrag() {
-    if (!isDown) return;
-    isDown = false;
-    container.style.cursor = 'grab';
-    // 惯性滑动
-    if (Math.abs(velocity) > 0.3) {
-      var inertia = function() {
-        velocity *= 0.95;
-        if (Math.abs(velocity) < 0.1) return;
-        container.scrollLeft -= velocity * 10;
-        animFrame = requestAnimationFrame(inertia);
-      };
-      inertia();
+  items.forEach(function(post) {
+    var year = post.getAttribute('data-year');
+    if (year && !processedYears.has(year)) {
+      // 如果是当前页第一个年份，且与前一页最后一个年份相同，则不显示标题
+      if (year === prevPageLastYear && years.indexOf(year) === 0) {
+        // 跳过，不显示年份标题
+      } else {
+        // 创建年份标题（带文章数量统计）
+        var yearHeader = document.createElement('div');
+        yearHeader.className = 'archive-year-header';
+        yearHeader.setAttribute('data-year', year);
+        var count = yearCounts[year] || 0;
+        var countText = count === 1 ? '1 POST' : count + ' POSTS';
+        yearHeader.innerHTML = '<span class="year-number">' + year + '</span><span class="year-count">' + countText + '</span>';
+        
+        // 在当前文章前插入年份标题
+        post.parentNode.insertBefore(yearHeader, post);
+      }
+      processedYears.add(year);
     }
+  });
+  
+  // 保存当前页最后一个年份到 sessionStorage
+  if (lastYear) {
+    sessionStorage.setItem('archive_prev_last_year', lastYear);
   }
-  
-  function doDrag(e) {
-    if (!isDown) return;
-    e.preventDefault();
-    var pageX = getPageX(e);
-    var x = pageX - container.offsetLeft;
-    var walk = x - startX;
-    var now = Date.now();
-    var dt = now - lastTime;
-    if (dt > 0) {
-      velocity = (x - lastX) / dt;
-    }
-    lastX = x;
-    lastTime = now;
-    container.scrollLeft = scrollLeft - walk;
-  }
-  
-  container.addEventListener('mousedown', startDrag);
-  document.addEventListener('mouseup', endDrag);
-  container.addEventListener('mousemove', doDrag);
-  
-  // 触摸支持
-  container.addEventListener('touchstart', startDrag, {passive: false});
-  container.addEventListener('touchend', endDrag);
-  container.addEventListener('touchmove', doDrag, {passive: false});
 })();
 </script>
 
 <style>
-/* 日期滑动切换 */
-.archive-date-slider {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  margin: 1em 0;
-  padding: 0.5em;
-  background: var(--card-color);
-  border-radius: var(--card-border-radius);
-  border: 1px solid var(--card-border-color);
+/* 年份标题样式 */
+.archive-year-header {
+  margin: 1.5em 0 0.8em 0;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--card-border-color);
 }
-.dates-container {
-  flex: 1;
-  display: flex;
-  gap: 0.5em;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  cursor: grab;
-  user-select: none;
-}
-.dates-container::-webkit-scrollbar { display: none; }
-.dates-container:active {
-  cursor: grabbing;
-}
-.date-item {
-  flex-shrink: 0;
-  padding: 0.3em 0.8em;
-  font-size: 13px;
+.archive-year-header .year-number {
+  font-size: 18px;
+  font-weight: 600;
   color: var(--font-color);
-  background: var(--bg-color);
-  border-radius: 4px;
-  text-decoration: none;
-  white-space: nowrap;
-  cursor: pointer;
 }
-.date-item:hover, .date-item.active {
-  background: var(--link-color);
-  color: #fff;
-  text-decoration: none;
-}
-.slider-btn {
-  flex-shrink: 0;
-  padding: 0.3em 0.5em;
-  font-size: 14px;
-  background: none;
-  border: none;
-  color: var(--link-color);
-  cursor: pointer;
+.archive-year-header .year-count {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--font-color);
+  opacity: 0.5;
+  margin-left: 0.8em;
+  letter-spacing: 0.05em;
 }
 
 /* 归档页紧凑样式 */
